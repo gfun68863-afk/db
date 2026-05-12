@@ -1,0 +1,95 @@
+p3
+
+db.books.insertMany([
+
+{
+    Bookname: "Database System",
+    Authors: ["Korth", "Sudarshan"],
+    Publisher: "McGraw Hill",
+    Edition: 5,
+    Year: 2018,
+    book_rating: 4.8,
+    no_of_copies: 25
+},
+
+{
+    Bookname: "Fundamental C",
+    Authors: ["Balkrishna"],
+    Publisher: "Tech Publication",
+    Edition: 2,
+    Year: 2026,
+    book_rating: 4.6,
+    no_of_copies: 40
+},
+
+{
+    Bookname: "Operating System",
+    Authors: ["Galvin"],
+    Publisher: "Wiley",
+    Edition: 7,
+    Year: 2015,
+    book_rating: 4.3,
+    no_of_copies: 18
+},
+
+{
+    Bookname: "Database Concepts",
+    Authors: ["Navathe"],
+    Publisher: "Pearson",
+    Edition: 6,
+    Year: 2018,
+    book_rating: 4.9,
+    no_of_copies: 30
+},
+
+{
+    Bookname: "C Programming",
+    Authors: ["Dennis Ritchie"],
+    Publisher: "PHI",
+    Edition: 1,
+    Year: 1995,
+    book_rating: 4.1,
+    no_of_copies: 12
+}
+
+])
+
+
+Queries
+i) Find information about all books of “Database”
+db.books.find({
+    Bookname: /Database/i
+})
+
+ii) Find book information of Author “Balkrishna” with Name “Fundamental C”
+db.books.find({
+    Bookname: "Fundamental C",
+    Authors: "Balkrishna"
+})
+
+iii) Display total no. of books published in 2018
+db.books.countDocuments({
+    Year: 2018
+})
+
+iv) Find total count of books having rating greater than 4.5
+db.books.countDocuments({
+    book_rating: { $gt: 4.5 }
+})
+
+v) Delete books published before 1999
+db.books.deleteMany({
+    Year: { $lt: 1999 }
+})
+
+vi) Decrease no_of_copies by 5 for books published in year 2026
+db.books.updateMany(
+{
+    Year: 2026
+},
+{
+    $inc: {
+        no_of_copies: -5
+    }
+}
+)

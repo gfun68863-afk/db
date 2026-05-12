@@ -1,0 +1,112 @@
+p2
+
+db.movies.insertMany([
+
+{
+    movie_name: "Avengers Endgame",
+    rating_star: 4.9,
+    movie_cast: ["Robert Downey Jr", "Chris Evans"],
+    release_date: ISODate("2020-05-10"),
+    budget: 350000000,
+    collection_amount: 850000000,
+    awards: ["International", "National"]
+},
+
+{
+    movie_name: "Pushpa",
+    rating_star: 4.5,
+    movie_cast: ["Allu Arjun", "Rashmika Mandanna"],
+    release_date: ISODate("2021-12-17"),
+    budget: 200000000,
+    collection_amount: 370000000,
+    awards: ["National"]
+},
+
+{
+    movie_name: "Adipurush",
+    rating_star: 1.8,
+    movie_cast: ["Prabhas", "Kriti Sanon"],
+    release_date: ISODate("2023-06-16"),
+    budget: 500000000,
+    collection_amount: 320000000,
+    awards: []
+},
+
+{
+    movie_name: "3 Idiots",
+    rating_star: 4.8,
+    movie_cast: ["Aamir Khan", "R Madhavan"],
+    release_date: ISODate("2020-01-20"),
+    budget: 55000000,
+    collection_amount: 460000000,
+    awards: ["International"]
+},
+
+{
+    movie_name: "Radhe",
+    rating_star: 1.9,
+    movie_cast: ["Salman Khan", "Disha Patani"],
+    release_date: ISODate("2021-05-13"),
+    budget: 150000000,
+    collection_amount: 90000000,
+    awards: []
+}
+
+])
+
+Queries
+1. Display total count of movies released in year 2020
+db.movies.countDocuments({
+    release_date: {
+        $gte: ISODate("2020-01-01"),
+        $lt: ISODate("2021-01-01")
+    }
+})
+
+2. Display movie names having both International and National awards
+db.movies.find(
+{
+    awards: {
+        $all: ["International", "National"]
+    }
+},
+{
+    movie_name: 1,
+    _id: 0
+}
+)
+
+3. Display all movies with rating more than 4.2
+db.movies.find({
+    rating_star: { $gt: 4.2 }
+})
+
+4. Display movie names whose collection is less than budget
+db.movies.find(
+{
+    $expr: {
+        $lt: ["$collection_amount", "$budget"]
+    }
+},
+{
+    movie_name: 1,
+    _id: 0
+}
+)
+
+5. Delete all movies with rating < 2.0
+db.movies.deleteMany({
+    rating_star: { $lt: 2.0 }
+})
+
+6. Provide International award to movies with rating > 4.8
+db.movies.updateMany(
+{
+    rating_star: { $gt: 4.8 }
+},
+{
+    $addToSet: {
+        awards: "International"
+    }
+}
+)

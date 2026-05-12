@@ -1,0 +1,152 @@
+p4
+db.students.insertMany([
+
+{
+    roll_no: 101,
+    name: "Amit Sharma",
+    address: {
+        city: "Pune",
+        state: "Maharashtra"
+    },
+    exam_date: ISODate("2026-02-18"),
+    marks: {
+        physics: 85,
+        chemistry: 78,
+        maths: 92
+    },
+    admission_date: ISODate("2020-06-15"),
+    scholarship: "National Merit"
+},
+
+{
+    roll_no: 102,
+    name: "Anjali Patil",
+    address: {
+        city: "Mumbai",
+        state: "Maharashtra"
+    },
+    exam_date: ISODate("2026-02-18"),
+    marks: {
+        physics: 88,
+        chemistry: 90,
+        maths: 95
+    },
+    admission_date: ISODate("2023-07-10"),
+    scholarship: "State Scholarship"
+},
+
+{
+    roll_no: 103,
+    name: "Rohit Verma",
+    address: {
+        city: "Delhi",
+        state: "Delhi"
+    },
+    exam_date: ISODate("2025-12-12"),
+    marks: {
+        physics: 67,
+        chemistry: 70,
+        maths: 55
+    },
+    admission_date: ISODate("2025-08-20"),
+    scholarship: "National Merit"
+},
+
+{
+    roll_no: 104,
+    name: "Akash Kulkarni",
+    address: {
+        city: "Nagpur",
+        state: "Maharashtra"
+    },
+    exam_date: ISODate("2026-01-15"),
+    marks: {
+        physics: 92,
+        chemistry: 89,
+        maths: 96
+    },
+    admission_date: ISODate("2021-09-05"),
+    scholarship: "None"
+}
+
+])
+
+
+1. Single Field Index
+db.students.createIndex({ roll_no: 1 })
+
+2. Compound Index
+db.students.createIndex({
+    "address.city": 1,
+    scholarship: 1
+})
+
+3. Ascending Index
+
+db.students.createIndex({
+    name: 1
+})
+
+db.students.find().sort({ name: 1 })
+
+4. Descending Index
+db.students.createIndex({
+    admission_date: -1
+})
+
+db.students.find().sort({
+    admission_date: -1
+})
+
+5. Multikey Index
+{
+   name: "Amit",
+   hobbies: ["Cricket", "Music", "Coding"]
+}
+
+db.students.createIndex({
+    hobbies: 1
+})
+
+db.students.find({
+    hobbies: "Coding"
+})
+
+6. Text Index
+db.students.createIndex({
+    name: "text"
+})
+
+db.students.find({
+    $text: {
+        $search: "Amit"
+    }
+})
+
+7. Unique Index
+db.students.createIndex(
+{
+    roll_no: 1
+},
+{
+    unique: true
+})
+
+8. Sparse Index
+Example
+db.students.createIndex(
+{
+    scholarship: 1
+},
+{
+    sparse: true
+})
+
+9. TTL (Time To Live) Index
+db.students.createIndex(
+{
+    exam_date: 1
+},
+{
+    expireAfterSeconds: 3600
+})

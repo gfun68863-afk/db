@@ -1,0 +1,117 @@
+p5
+
+db.movies.insertMany([
+
+{
+    movie_name: "Avengers Endgame",
+    rating_star: 4.9,
+    movie_cast: ["Robert Downey Jr", "Chris Evans"],
+    release_date: ISODate("2020-05-10"),
+    budget: 350000000,
+    collection_amount: 850000000,
+    awards: ["International", "National"]
+},
+
+{
+    movie_name: "Pushpa",
+    rating_star: 4.5,
+    movie_cast: ["Allu Arjun", "Rashmika Mandanna"],
+    release_date: ISODate("2021-12-17"),
+    budget: 200000000,
+    collection_amount: 370000000,
+    awards: ["National"]
+},
+
+{
+    movie_name: "3 Idiots",
+    rating_star: 4.8,
+    movie_cast: ["Aamir Khan", "R Madhavan"],
+    release_date: ISODate("2020-01-20"),
+    budget: 55000000,
+    collection_amount: 460000000,
+    awards: ["International"]
+},
+
+{
+    movie_name: "Adipurush",
+    rating_star: 1.8,
+    movie_cast: ["Prabhas", "Kriti Sanon"],
+    release_date: ISODate("2023-06-16"),
+    budget: 500000000,
+    collection_amount: 320000000,
+    awards: []
+}
+
+])
+
+1. Single Field Index
+db.movies.createIndex({
+    movie_name: 1
+})
+
+2. Ascending Index
+db.movies.createIndex({
+    rating_star: 1
+})
+
+3. Descending Index
+db.movies.createIndex({
+    release_date: -1
+})
+
+4. Compound Index
+Index on rating and collection amount
+db.movies.createIndex({
+    rating_star: 1,
+    collection_amount: -1
+})
+
+db.movies.find({
+    rating_star: { $gt: 4.0 }
+}).sort({
+    collection_amount: -1
+})
+5. Multikey Index
+db.movies.createIndex({
+    movie_cast: 1
+})
+
+db.movies.find({
+    movie_cast: "Allu Arjun"
+})
+
+6. Text Index
+Create Text Index on movie_name
+db.movies.createIndex({
+    movie_name: "text"
+})
+Query Example
+db.movies.find({
+    $text: {
+        $search: "Avengers"
+    }
+})
+
+7. Unique Index
+db.movies.createIndex(
+{
+    movie_name: 1
+},
+{
+    unique: true
+})
+
+db.movies.getIndexes()
+
+db.movies.find({
+    rating_star: 4.5
+}).explain("executionStats")
+
+db.movies.createIndex({
+    rating_star: 1
+})
+
+db.movies.find({
+    rating_star: 4.5
+}).explain("executionStats")
+

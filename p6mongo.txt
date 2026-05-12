@@ -1,0 +1,130 @@
+p6
+
+db.books.insertMany([
+
+{
+    Bookname: "Fundamental C",
+    subjectName: "Programming",
+    Author: "Balkrishna",
+    Publisher: "Tech Publication",
+    Edition: 2,
+    Year: 2026,
+    price: 650
+},
+
+{
+    Bookname: "Database System",
+    subjectName: "Database",
+    Author: "Korth",
+    Publisher: "McGraw Hill",
+    Edition: 5,
+    Year: 2018,
+    price: 720
+},
+
+{
+    Bookname: "Operating System",
+    subjectName: "System",
+    Author: "Galvin",
+    Publisher: "Wiley",
+    Edition: 7,
+    Year: 2024,
+    price: 480
+},
+
+{
+    Bookname: "Java Programming",
+    subjectName: "Programming",
+    Author: "Herbert Schildt",
+    Publisher: "Oracle Press",
+    Edition: 8,
+    Year: 2022,
+    price: 590
+},
+
+{
+    Bookname: "Computer Network",
+    subjectName: "Networking",
+    Author: "Tanenbaum",
+    Publisher: "Pearson",
+    Edition: 4,
+    Year: 2025,
+    price: 680
+}
+
+])
+
+1. Create Index on Author in Ascending Order
+db.books.createIndex({
+    Author: 1
+})
+
+2. Create Compound Index on Author and Bookname
+db.books.createIndex({
+    Author: 1,
+    Bookname: 1
+})
+
+3. Display Recently Published Book
+db.books.find().sort({
+    Year: -1
+}).limit(1)
+
+4. Find All Books Costing More Than 500
+db.books.find({
+    price: { $gt: 500 }
+})
+
+5. Update Price of “Fundamental C” Book
+db.books.updateOne(
+{
+    Bookname: "Fundamental C"
+},
+{
+    $set: {
+        price: 700
+    }
+}
+)
+
+6. Delete Books with Price < 500
+db.books.deleteMany({
+    price: { $lt: 500 }
+})
+
+7. Find Average Price of Books
+db.books.aggregate([
+{
+    $group: {
+        _id: null,
+        average_price: {
+            $avg: "$price"
+        }
+    }
+}
+])
+
+8. Count Books by Subject
+db.books.aggregate([
+{
+    $group: {
+        _id: "$subjectName",
+        total_books: {
+            $sum: 1
+        }
+    }
+}
+])
+
+9. Find Books Between Price Range 500 and 700
+db.books.find({
+    price: {
+        $gte: 500,
+        $lte: 700
+    }
+})
+
+10. Sort Books by Year (Newest First)
+db.books.find().sort({
+    Year: -1
+})

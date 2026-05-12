@@ -1,0 +1,219 @@
+p13
+
+db.courses.insertMany([
+
+{
+    title: "Database Management System",
+    department: "Computer Engineering",
+    credit_hours: 4,
+
+    instructor: {
+        name: "Raman",
+        experience: 22,
+        designation: "Professor",
+        department: "Computer Engineering"
+    },
+
+    enrollments: [
+        {
+            student_name: "Amit",
+            score: 88,
+            pass_status: true
+        },
+        {
+            student_name: "Anjali",
+            score: 91,
+            pass_status: true
+        },
+        {
+            student_name: "Rohit",
+            score: 40,
+            pass_status: false
+        }
+    ]
+},
+
+{
+    title: "Operating System",
+    department: "Computer Engineering",
+    credit_hours: 3,
+
+    instructor: {
+        name: "Anita",
+        experience: 12,
+        designation: "Associate Professor",
+        department: "Computer Engineering"
+    },
+
+    enrollments: [
+        {
+            student_name: "Kiran",
+            score: 78,
+            pass_status: true
+        },
+        {
+            student_name: "Sneha",
+            score: 84,
+            pass_status: true
+        },
+        {
+            student_name: "Raj",
+            score: 35,
+            pass_status: false
+        }
+    ]
+},
+
+{
+    title: "Computer Networks",
+    department: "Information Technology",
+    credit_hours: 4,
+
+    instructor: {
+        name: "Suresh",
+        experience: 18,
+        designation: "Professor",
+        department: "Information Technology"
+    },
+
+    enrollments: [
+        {
+            student_name: "Pooja",
+            score: 95,
+            pass_status: true
+        },
+        {
+            student_name: "Akash",
+            score: 89,
+            pass_status: true
+        }
+    ]
+}
+
+])
+
+1. Count Number of Courses Taught by Each Instructor
+db.courses.aggregate([
+
+{
+    $group: {
+        _id: "$instructor.name",
+        total_courses: {
+            $sum: 1
+        }
+    }
+}
+
+])
+
+2. Calculate Average Marks Scored in Every Course
+db.courses.aggregate([
+
+{
+    $unwind: "$enrollments"
+},
+
+{
+    $group: {
+        _id: "$title",
+        average_marks: {
+            $avg: "$enrollments.score"
+        }
+    }
+}
+
+])
+
+3. List Faculty in Descending Order of Experience Within Each Department
+db.courses.aggregate([
+
+{
+    $project: {
+        department: "$instructor.department",
+        faculty_name: "$instructor.name",
+        experience: "$instructor.experience",
+        designation: "$instructor.designation"
+    }
+},
+
+{
+    $sort: {
+        department: 1,
+        experience: -1
+    }
+}
+
+])
+
+4. List Students with Highest Scores
+db.courses.aggregate([
+
+{
+    $unwind: "$enrollments"
+},
+
+{
+    $sort: {
+        "enrollments.score": -1
+    }
+},
+
+{
+    $limit: 1
+},
+
+{
+    $project: {
+        _id: 0,
+        student_name: "$enrollments.student_name",
+        score: "$enrollments.score",
+        course: "$title"
+    }
+}
+
+])
+
+5. Calculate Pass Percentage in Each Course
+db.courses.aggregate([
+
+{
+    $project: {
+        title: 1,
+
+        total_students: {
+            $size: "$enrollments"
+        },
+
+        passed_students: {
+            $size: {
+                $filter: {
+                    input: "$enrollments",
+                    as: "student",
+                    cond: {
+                        $eq: ["$$student.pass_status", true]
+                    }
+                }
+            }
+        }
+    }
+},
+
+{
+    $project: {
+        title: 1,
+
+        pass_percentage: {
+            $multiply: [
+                {
+                    $divide: [
+                        "$passed_students",
+                        "$total_students"
+                    ]
+                },
+                100
+            ]
+        }
+    }
+}
+
+])

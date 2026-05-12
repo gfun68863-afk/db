@@ -1,0 +1,153 @@
+p12
+
+db.teachers.insertMany([
+
+{
+    name: "Raman",
+    qualifications: ["M.Tech", "PhD"],
+    department: {
+        dept_name: "Computer Engineering"
+    },
+    experience: 22,
+    salary_structure: {
+        basic_pay: 85000,
+        hra: 12000
+    },
+    date_of_joining: ISODate("2004-06-15"),
+    appointment_nature: "Permanent",
+    area_of_expertise: ["DBMS", "MongoDB"]
+},
+
+{
+    name: "Anita",
+    qualifications: ["M.E"],
+    department: {
+        dept_name: "Computer Engineering"
+    },
+    experience: 8,
+    salary_structure: {
+        basic_pay: 60000,
+        hra: 9000
+    },
+    date_of_joining: ISODate("2018-08-10"),
+    appointment_nature: "Permanent",
+    area_of_expertise: ["Networking"]
+},
+
+{
+    name: "Suresh",
+    qualifications: ["M.Sc"],
+    department: {
+        dept_name: "Information Technology"
+    },
+    experience: 3,
+    salary_structure: {
+        basic_pay: 42000,
+        hra: 5000
+    },
+    date_of_joining: ISODate("2023-01-12"),
+    appointment_nature: "Contract",
+    area_of_expertise: ["Python"]
+},
+
+{
+    name: "Kiran",
+    qualifications: ["PhD"],
+    department: {
+        dept_name: "Electronics"
+    },
+    experience: 25,
+    salary_structure: {
+        basic_pay: 92000,
+        hra: 15000
+    },
+    date_of_joining: ISODate("2000-05-20"),
+    appointment_nature: "Permanent",
+    area_of_expertise: ["Embedded Systems"]
+}
+
+])
+
+1. Add Document if it Does Not Exist (save() method)
+db.teachers.save({
+    _id: 105,
+    name: "Mahesh",
+    qualifications: ["M.Tech"],
+    department: {
+        dept_name: "Mechanical"
+    },
+    experience: 5,
+    salary_structure: {
+        basic_pay: 50000,
+        hra: 7000
+    },
+    date_of_joining: ISODate("2021-07-01"),
+    appointment_nature: "Permanent",
+    area_of_expertise: ["Thermodynamics"]
+})
+
+2. Increment Basic Pay by 10%
+db.teachers.updateMany(
+{},
+[
+{
+    $set: {
+        "salary_structure.basic_pay": {
+            $multiply: [
+                "$salary_structure.basic_pay",
+                1.10
+            ]
+        }
+    }
+}
+]
+)
+
+3. Add New Area of Expertise for Faculty ‘Raman’
+db.teachers.updateOne(
+{
+    name: "Raman"
+},
+{
+    $addToSet: {
+        area_of_expertise: "Artificial Intelligence"
+    }
+}
+)
+
+4. Display Teachers in Descending Order of Experience
+db.teachers.find().sort({
+    experience: -1
+})
+
+5. Change Department of Anita
+db.teachers.updateOne(
+{
+    name: "Anita"
+},
+{
+    $set: {
+        "department.dept_name": "Information Technology"
+    }
+}
+)
+
+6. Delete Teachers Having Experience Between 2 to 3 Years
+db.teachers.deleteMany({
+    experience: {
+        $gte: 2,
+        $lte: 3
+    }
+})
+
+7. Display Teachers Having Experience > 20 OR Having PhD
+db.teachers.find({
+    $or: [
+        {
+            experience: { $gt: 20 }
+        },
+        {
+            qualifications: "PhD"
+        }
+    ]
+})
