@@ -1,0 +1,104 @@
+p12
+
+
+CREATE TABLE EMPLOYEE (
+
+    Emp_Id NUMBER PRIMARY KEY,
+    First_Name VARCHAR2(30),
+    Last_Name VARCHAR2(30),
+    Email VARCHAR2(50),
+    Phone_No VARCHAR2(15),
+    Hire_Date DATE,
+    Job_Profile VARCHAR2(30),
+    Salary NUMBER,
+    HRA NUMBER
+
+);
+
+CREATE TABLE EMP_LOG (
+
+    Emp_Id NUMBER,
+    Salary NUMBER,
+    Date_of_Joining DATE,
+    Date_Leaving DATE,
+    Job_Status VARCHAR2(20)
+
+);
+
+Step 3: BEFORE INSERT Trigger
+Purpose
+
+CREATE OR REPLACE TRIGGER trg_before_insert
+BEFORE INSERT
+ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+    :NEW.HRA := :NEW.Salary * 0.10;
+END;
+/
+
+Step 4: AFTER INSERT Trigger
+CREATE OR REPLACE TRIGGER trg_after_insert
+AFTER INSERT
+ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+    INSERT INTO EMP_LOG
+    VALUES(
+        :NEW.Emp_Id,
+        :NEW.Salary,
+        :NEW.Hire_Date,
+        NULL,
+        'ACTIVE'
+    );
+END;
+/
+
+Step 5: AFTER DELETE Trigger
+CREATE OR REPLACE TRIGGER trg_after_delete
+AFTER DELETE
+ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+    INSERT INTO EMP_LOG
+    VALUES(
+        :OLD.Emp_Id,
+        :OLD.Salary,
+        :OLD.Hire_Date,
+        SYSDATE,
+        'REMOVED'
+    );
+END;
+/
+
+Step 6: Insert Employee Records
+INSERT INTO EMPLOYEE
+VALUES(
+101,
+'Amit',
+'Sharma',
+'amit@gmail.com',
+'9876543210',
+TO_DATE('01-01-2020','DD-MM-YYYY'),
+'Manager',
+50000,
+NULL
+);
+
+INSERT INTO EMPLOYEE
+VALUES(
+102,
+'Neha',
+'Patil',
+'neha@gmail.com',
+'9876543211',
+TO_DATE('15-03-2021','DD-MM-YYYY'),
+'Developer',
+40000,
+NULL
+);
+
+COMMIT;
+
+Step 7: Check EMPLOYEE Table
+SELECT * FROM EMPLOYEE;

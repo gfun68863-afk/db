@@ -1,0 +1,120 @@
+p5
+
+CREATE TABLE Department (
+    dept_id INT PRIMARY KEY,
+    dept_name VARCHAR(50),
+    building VARCHAR(50),
+    loc VARCHAR(50)
+);
+
+CREATE TABLE Instructor (
+    instructor_id INT PRIMARY KEY,
+    instructor_name VARCHAR(50),
+    dept_id INT,
+    salary DECIMAL(10,2),
+
+    FOREIGN KEY (dept_id)
+    REFERENCES Department(dept_id)
+);
+
+CREATE TABLE Course (
+    course_id INT PRIMARY KEY,
+    course_name VARCHAR(50),
+    dept_name VARCHAR(50),
+    credits INT,
+    instructor_id INT,
+
+    FOREIGN KEY (instructor_id)
+    REFERENCES Instructor(instructor_id)
+);
+
+CREATE TABLE Enrollment (
+    enrollment_id INT PRIMARY KEY,
+    course_id INT,
+    date_of_enrollment DATE,
+
+    FOREIGN KEY (course_id)
+    REFERENCES Course(course_id)
+);
+
+INSERT INTO Department VALUES
+(1,'IT','A Block','Pune'),
+(2,'CE','B Block','Mumbai'),
+(3,'ENTC','C Block','Delhi'),
+(4,'Mechanical','D Block','Nashik');
+
+INSERT INTO Instructor VALUES
+(101,'Dr. Sharma',1,80000),
+(102,'Dr. Patil',2,70000),
+(103,'Dr. Mehta',2,60000),
+(104,'Dr. Joshi',3,50000);
+
+INSERT INTO Course VALUES
+(201,'DBMS','IT',4,101),
+(202,'OS','IT',3,101),
+(203,'CN','CE',5,102),
+(204,'AI','ENTC',4,103);
+
+INSERT INTO Enrollment VALUES
+(1,201,'2021-01-10'),
+(2,202,'2019-05-12'),
+(3,203,'2022-07-15'),
+(4,204,'2023-03-20');
+
+Query 1: Display Courses with Credits Greater Than 3 and Instructors Handling Them
+SELECT c.course_name,
+       c.credits,
+       i.instructor_name
+FROM Course c
+JOIN Instructor i
+ON c.instructor_id = i.instructor_id
+WHERE c.credits > 3;
+
+Query 2: List Instructors with Their Department Names in Descending Order of Salary
+SELECT i.instructor_name,
+       d.dept_name,
+       i.salary
+FROM Instructor i
+JOIN Department d
+ON i.dept_id = d.dept_id
+ORDER BY i.salary DESC;
+
+Query 3: Find Instructors Who Teach More Than One Course
+SELECT i.instructor_name,
+       COUNT(c.course_id) AS total_courses
+FROM Instructor i
+JOIN Course c
+ON i.instructor_id = c.instructor_id
+GROUP BY i.instructor_name
+HAVING COUNT(c.course_id) > 1;
+
+Query 4: Find Instructor(s) with Salary Less Than Average Salary
+SELECT instructor_name, salary
+FROM Instructor
+WHERE salary < (
+    SELECT AVG(salary)
+    FROM Instructor
+);
+C
+Query 5: Create View of Instructors and Their Courses Enrolled After '2020-01-01'
+CREATE VIEW Instructor_Course_After2020 AS
+SELECT i.instructor_name,
+       c.course_name,
+       e.date_of_enrollment
+FROM Instructor i
+JOIN Course c
+ON i.instructor_id = c.instructor_id
+JOIN Enrollment e
+ON c.course_id = e.course_id
+WHERE e.date_of_enrollment > '2020-01-01';
+Display View
+SELECT * FROM Instructor_Course_After2020;
+
+Query 6: Decrease Salary of CE Department Instructors by 10%
+UPDATE Instructor
+SET salary = salary - (salary * 0.10)
+WHERE dept_id = (
+    SELECT dept_id
+    FROM Department
+    WHERE dept_name = 'CE'
+);

@@ -1,0 +1,174 @@
+import java.sql.*;
+import java.util.Scanner;
+
+public class App {
+
+    static final String URL = "jdbc:mysql://10.10.8.119:3306/se21343_db";
+    static final String USER = "se21343";
+    static final String PASSWORD = "se21343";
+
+    public static void main(String[] args) {
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             Scanner sc = new Scanner(System.in)) {
+
+            System.out.println(" Connected to Database!");
+
+            createTable(conn);
+
+            int choice;
+
+            do {
+                System.out.println("\n===== MENU =====");
+                System.out.println("1. Add User");
+                System.out.println("2. View All Users");
+                System.out.println("3. Search User by Name");
+                System.out.println("4. Update User");
+                System.out.println("5. Delete User");
+                System.out.println("0. Exit");
+                System.out.print("Enter choice: ");
+
+                choice = sc.nextInt();
+                sc.nextLine(); // consume newline
+
+                switch (choice) {
+
+                    case 1:
+                        System.out.print("Enter name: ");
+                        String name = sc.nextLine();
+
+                        System.out.print("Enter email: ");
+                        String email = sc.nextLine();
+
+                        insertUser(conn, name, email);
+                        break;
+
+                    case 2:
+                        getUsers(conn);
+                        break;
+
+                    case 3:
+                        System.out.print("Enter name to search: ");
+                        String searchName = sc.nextLine();
+                        searchUser(conn, searchName);
+                        break;
+
+                    case 4:
+                        System.out.print("Enter user ID to update: ");
+                        int id = sc.nextInt();
+                        sc.nextLine();
+
+                        System.out.print("Enter new name: ");
+                        String newName = sc.nextLine();
+
+                        updateUser(conn, id, newName);
+                        break;
+
+                    case 5:
+                        System.out.print("Enter user ID to delete: ");
+                        int deleteId = sc.nextInt();
+
+                        deleteUser(conn, deleteId);
+                        break;
+
+                    case 0:
+                        System.out.println(" Exiting...");
+                        break;
+
+                    default:
+                        System.out.println(" Invalid choice!");
+                }
+
+            } while (choice != 0);
+
+        } catch (Exception e) {
+            System.err.println(" Error:");
+            e.printStackTrace();
+        }
+    }
+
+    // CREATE TABLE
+    public static void createTable(Connection conn) throws SQLException {
+        String query = "CREATE TABLE IF NOT EXISTS users (" +
+                "id INT PRIMARY KEY AUTO_INCREMENT, " +
+                "name VARCHAR(100), " +
+                "email VARCHAR(100))";
+
+        Statement stmt = conn.createStatement();
+        stmt.executeUpdate(query);
+        System.out.println(" Table ready.");
+    }
+
+    // INSERT USER
+    public static void insertUser(Connection conn, String name, String email) throws SQLException {
+        String query = "INSERT INTO users (name, email) VALUES (?, ?)";
+
+        PreparedStatement ps = conn.prepareStatement(query);
+        ps.setString(1, name);
+        ps.setString(2, email);
+
+        int rows = ps.executeUpdate();
+        System.out.println(" " + rows + " user added.");
+    }
+
+    // VIEW USERS
+    public static void getUsers(Connection conn) throws SQLException {
+        String query = "SELECT * FROM users";
+
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+
+        System.out.println("\n--- USER LIST ---");
+
+        while (rs.next()) {
+            System.out.println(
+                    "ID: " + rs.getInt("id") +
+                    " | Name: " + rs.getString("name") +
+                    " | Email: " + rs.getString("email")
+            );
+        }
+    }
+
+    // SEARCH USER
+    public static void searchUser(Connection conn, String name) throws SQLException {
+        String query = "SELECT * FROM users WHERE name LIKE ?";
+
+        PreparedStatement ps = conn.prepareStatement(query);
+        ps.setString(1, "%" + name + "%");
+
+        ResultSet rs = ps.executeQuery();
+
+        System.out.println("\n Search Results:");
+
+        while (rs.next()) {
+            System.out.println(
+                    "ID: " + rs.getInt("id") +
+                    " | Name: " + rs.getString("name") +
+                    " | Email: " + rs.getString("email")
+            );
+        }
+    }
+
+    // UPDATE USER
+    public static void updateUser(Connection conn, int id, String newName) throws SQLException {
+        String query = "UPDATE users SET name = ? WHERE id = ?";
+
+        PreparedStatement ps = conn.prepareStatement(query);
+        ps.setString(1, newName);
+        ps.setInt(2, id);
+
+        int rows = ps.executeUpdate();
+        System.out.println(" " + rows + " user updated.");
+    }
+
+    // DELETE USER
+    public static void deleteUser(Connection conn, int id) throws SQLException {
+        String query = "DELETE FROM users WHERE id = ?";
+
+        PreparedStatement ps = conn.prepareStatement(query);
+        ps.setInt(1, id);
+
+        int rows = ps.executeUpdate();
+        System.out.println(" " + rows + " user deleted.");
+    }
+}

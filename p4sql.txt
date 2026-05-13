@@ -1,0 +1,82 @@
+p4
+
+CREATE TABLE Department (
+    dept_id INT PRIMARY KEY,
+    dept_name VARCHAR(50),
+    building VARCHAR(50),
+    loc VARCHAR(50)
+);
+
+CREATE TABLE Instructor (
+    instructor_id INT PRIMARY KEY,
+    instructor_name VARCHAR(50),
+    dept_id INT,
+    salary DECIMAL(10,2),
+
+    FOREIGN KEY (dept_id)
+    REFERENCES Department(dept_id)
+);
+
+CREATE TABLE Course (
+    course_id INT PRIMARY KEY,
+    course_name VARCHAR(50),
+    dept_name VARCHAR(50),
+    credits INT,
+    instructor_id INT,
+
+    FOREIGN KEY (instructor_id)
+    REFERENCES Instructor(instructor_id)
+);
+
+
+Query 1: Display Instructors' Details and Their Department Names
+SELECT i.instructor_id,
+       i.instructor_name,
+       i.salary,
+       d.dept_name
+FROM Instructor i
+JOIN Department d
+ON i.dept_id = d.dept_id;
+
+Query 2: Display Total Number of Instructors Belonging to Each Department
+SELECT d.dept_name,
+       COUNT(i.instructor_id) AS total_instructors
+FROM Department d
+LEFT JOIN Instructor i
+ON d.dept_id = i.dept_id
+GROUP BY d.dept_name;
+
+Query 3: Create View to List Departments That Do Not Have Any Instructors
+CREATE VIEW Department_No_Instructor AS
+SELECT d.dept_name
+FROM Department d
+LEFT JOIN Instructor i
+ON d.dept_id = i.dept_id
+WHERE i.instructor_id IS NULL;
+
+Query 4: Display Courses with Credits Greater Than 3 and Instructor Details
+SELECT c.course_name,
+       c.credits,
+       i.instructor_name,
+       i.salary
+FROM Course c
+JOIN Instructor i
+ON c.instructor_id = i.instructor_id
+WHERE c.credits > 3;
+
+Query 5: Find Instructors Who Teach More Than One Course
+SELECT i.instructor_name,
+       COUNT(c.course_id) AS total_courses
+FROM Instructor i
+JOIN Course c
+ON i.instructor_id = c.instructor_id
+GROUP BY i.instructor_name
+HAVING COUNT(c.course_id) > 1;
+
+Query 6: Find Instructors Having Salary Greater Than Average Salary
+SELECT instructor_name, salary
+FROM Instructor
+WHERE salary > (
+    SELECT AVG(salary)
+    FROM Instructor
+);

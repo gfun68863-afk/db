@@ -1,0 +1,80 @@
+Step 6: Open Eclipse
+
+Launch:
+
+Eclipse IDE
+
+Choose workspace folder.
+
+Example:
+
+/home/yourname/eclipse-workspace
+Step 7: Create Java Project
+
+In Eclipse:
+
+Click
+File → New → Java Project
+
+Project Name:
+
+JDBCMovieProject
+
+Click:
+
+Finish
+Step 8: Create Java Class
+
+Inside project:
+
+Right Click
+src → New → Class
+
+Class Name:
+
+MovieJDBC
+
+Check:
+
+public static void main(String[] args)
+
+Click:
+
+Finish
+Step 9: Add JDBC Jar File in Eclipse
+Right Click Project
+JDBCMovieProject
+
+Then:
+
+Build Path → Configure Build Path
+
+Then:
+
+Libraries → Classpath
+
+Click:
+
+Add External JARs
+
+Select:
+
+mysql-connector-j-9.x.x.jar
+
+from Downloads folder.
+
+Click:
+
+Apply and Close
+
+
+Step 12: Run Program
+
+In Eclipse:
+
+Right Click
+MovieJDBC.java
+
+Then:
+
+Run As → Java Application

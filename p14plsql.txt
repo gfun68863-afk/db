@@ -1,0 +1,133 @@
+p14
+
+CREATE TABLE EMPLOYEE (
+    Emp_Id NUMBER PRIMARY KEY,
+    First_Name VARCHAR2(30),
+    Last_Name VARCHAR2(30),
+    Email VARCHAR2(50),
+    Phone_No VARCHAR2(15),
+    Hire_Date DATE,
+    Job_Profile VARCHAR2(30),
+    Salary NUMBER,
+    HRA NUMBER
+);
+
+CREATE TABLE COMPANY_INFO (
+    Emp_Count NUMBER,
+    Total_Salary_Expenses NUMBER
+
+);
+
+CREATE TABLE EMP_LOG (
+    Emp_Id NUMBER,
+    Old_Salary NUMBER,
+    New_Salary NUMBER,
+    Edit_Time DATE,
+    Job_Status VARCHAR2(20)
+
+);
+
+Step 4: Insert Initial Record into COMPANY_INFO
+INSERT INTO COMPANY_INFO
+VALUES(0,0);
+
+COMMIT;
+
+Step 5: Insert Employee Records
+INSERT INTO EMPLOYEE
+VALUES(
+101,
+'Amit',
+'Sharma',
+'amit@gmail.com',
+'9876543210',
+TO_DATE('01-01-2020','DD-MM-YYYY'),
+'Manager',
+50000,
+5000
+);
+
+INSERT INTO EMPLOYEE
+VALUES(
+102,
+'Neha',
+'Patil',
+'neha@gmail.com',
+'9876543211',
+TO_DATE('10-03-2021','DD-MM-YYYY'),
+'Developer',
+40000,
+4000
+);
+
+COMMIT;
+
+Step 6: Update COMPANY_INFO Initially
+UPDATE COMPANY_INFO
+
+SET Emp_Count =
+(
+    SELECT COUNT(*) FROM EMPLOYEE
+),
+
+Total_Salary_Expenses =
+(
+    SELECT SUM(Salary) FROM EMPLOYEE
+);
+
+COMMIT;
+
+Step 7: Create BEFORE UPDATE Trigger
+CREATE OR REPLACE TRIGGER trg_before_update
+BEFORE UPDATE OF Salary
+ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+    :NEW.HRA := :NEW.Salary * 0.10;
+END;
+/
+
+Step 8: Create AFTER UPDATE Trigger for COMPANY_INFO
+CREATE OR REPLACE TRIGGER trg_after_update_company
+AFTER UPDATE OF Salary
+ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+    UPDATE COMPANY_INFO
+    SET Total_Salary_Expenses =
+        Total_Salary_Expenses
+        - :OLD.Salary
+        + :NEW.Salary;
+END;
+/
+
+Step 9: Create AFTER UPDATE Trigger for EMP_LOG
+CREATE OR REPLACE TRIGGER trg_after_update_log
+AFTER UPDATE OF Salary
+ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+    INSERT INTO EMP_LOG
+    VALUES(
+        :OLD.Emp_Id,
+        :OLD.Salary,
+        :NEW.Salary,
+        SYSDATE,
+        'UPDATED'
+    );
+END;
+/
+
+Step 10: Display Initial Tables
+EMPLOYEE
+
+SELECT * FROM EMPLOYEE;
+COMPANY_INFO
+SELECT * FROM COMPANY_INFO;
+
+Step 11: Update Salary
+UPDATE EMPLOYEE
+SET Salary = 60000
+WHERE Emp_Id = 101;
+
+COMMIT;

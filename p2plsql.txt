@@ -1,0 +1,79 @@
+p2
+
+CREATE TABLE Customer (
+    Cust_id NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    Total_Purchase NUMBER
+);
+
+CREATE TABLE Category (
+    Cust_id NUMBER,
+    Name VARCHAR2(50),
+    Class VARCHAR2(20)
+);
+
+
+INSERT INTO Customer VALUES (101, 'Amit', 15000);
+INSERT INTO Customer VALUES (102, 'Neha', 7000);
+INSERT INTO Customer VALUES (103, 'Rahul', 3000);
+INSERT INTO Customer VALUES (104, 'Priya', 22000);
+INSERT INTO Customer VALUES (105, 'Karan', 5000);
+
+COMMIT;
+
+Step 7: Create Procedure
+
+CREATE OR REPLACE PROCEDURE proc_Grade
+AS
+    CURSOR c1 IS
+        SELECT Cust_id, Name, Total_Purchase
+        FROM Customer;
+
+    v_class VARCHAR2(20);
+
+BEGIN
+
+    FOR rec IN c1 LOOP
+
+        IF rec.Total_Purchase <= 20000 
+           AND rec.Total_Purchase >= 10000 THEN
+           
+            v_class := 'Platinum';
+
+        ELSIF rec.Total_Purchase BETWEEN 5000 AND 9999 THEN
+
+            v_class := 'Gold';
+
+        ELSIF rec.Total_Purchase BETWEEN 2000 AND 4999 THEN
+
+            v_class := 'Silver';
+
+        ELSE
+
+            v_class := 'No Category';
+
+        END IF;
+
+        INSERT INTO Category
+        VALUES(rec.Cust_id, rec.Name, v_class);
+
+    END LOOP;
+
+    COMMIT;
+
+END;
+/
+
+
+Step 8: Execute Procedure
+
+Run:
+
+BEGIN
+    proc_Grade;
+END;
+/
+
+OR directly:
+
+EXEC proc_Grade;

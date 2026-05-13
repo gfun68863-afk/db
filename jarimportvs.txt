@@ -1,0 +1,52 @@
+Step 4: Create Project Folder in VS Code
+
+Open terminal:
+
+mkdir JDBCMovieProject
+cd JDBCMovieProject
+code .
+
+Create:
+
+mkdir lib
+mkdir src
+Step 5: Copy JAR File into lib Folder
+
+Suppose your jar file is in Downloads.
+
+Syntax:
+
+cp ~/Downloads/mysql-connector-j-9.x.x/mysql-connector-j-9.x.x.jar lib/
+
+Check:
+
+ls lib
+Step 6: Create Java File
+
+Inside src folder:
+
+touch src/MovieJDBC.java
+
+
+Step 9: Compile Program in VS Code Terminal
+
+Move to project folder:
+
+cd JDBCMovieProject
+
+Compile syntax:
+
+javac -cp "lib/mysql-connector-j-9.x.x.jar" src/MovieJDBC.java
+
+For Ubuntu/Linux sometimes this also works:
+
+javac -cp lib/mysql-connector-j-9.x.x.jar src/MovieJDBC.java
+Step 10: Run Program
+
+Syntax:
+
+java -cp "lib/mysql-connector-j-9.x.x.jar:src" MovieJDBC
+
+OR
+
+java -cp lib/mysql-connector-j-9.x.x.jar:src MovieJDBC

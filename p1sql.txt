@@ -1,0 +1,95 @@
+p1
+
+CREATE TABLE Department (
+    dept_id INT PRIMARY KEY,
+    dept_name VARCHAR(50),
+    building VARCHAR(50),
+    loc VARCHAR(50)
+);
+
+CREATE TABLE Student (
+    stud_id INT PRIMARY KEY,
+    stud_name VARCHAR(50),
+    email VARCHAR(100),
+    phone VARCHAR(15),
+    dob DATE,
+    dept_id INT,
+    
+    FOREIGN KEY (dept_id)
+    REFERENCES Department(dept_id)
+);
+
+CREATE TABLE Instructor (
+    instructor_id INT PRIMARY KEY,
+    instructor_name VARCHAR(50),
+    dept_id INT,
+    salary DECIMAL(10,2),
+
+    FOREIGN KEY (dept_id)
+    REFERENCES Department(dept_id)
+);
+
+INSERT INTO Department VALUES
+(1,'IT','A Block','Pune'),
+(2,'Computer','B Block','Mumbai'),
+(3,'ENTC','C Block','Pune'),
+(4,'Mechanical','D Block','Delhi');
+
+INSERT INTO Student VALUES
+(101,'Rahul','rahul@gmail.com','9876543210','2003-05-10',1),
+(102,'Priya','priya@gmail.com','9876543211','2002-08-15',1),
+(103,'Amit','amit@gmail.com','9876543212','2003-01-20',2),
+(104,'Sneha','sneha@gmail.com','9876543213','2002-09-25',3);
+
+INSERT INTO Instructor VALUES
+(201,'Dr. Sharma',1,80000),
+(202,'Dr. Patil',2,90000),
+(203,'Dr. Joshi',1,90000),
+(204,'Dr. Mehta',3,75000);
+
+Query 1: List Students and Their Department Names
+SELECT s.stud_name, d.dept_name
+FROM Student s
+JOIN Department d
+ON s.dept_id = d.dept_id;
+
+Query 2: Display Total Number of Students in Each Department
+SELECT d.dept_name, COUNT(s.stud_id) AS total_students
+FROM Department d
+LEFT JOIN Student s
+ON d.dept_id = s.dept_id
+GROUP BY d.dept_name;
+
+Query 3: Department Names That Do Not Have Any Students
+SELECT d.dept_name
+FROM Department d
+LEFT JOIN Student s
+ON d.dept_id = s.dept_id
+WHERE s.stud_id IS NULL;
+
+Query 4: Find Instructor(s) with Highest Salary
+SELECT instructor_name, salary
+FROM Instructor
+WHERE salary = (
+    SELECT MAX(salary)
+    FROM Instructor
+);
+
+Query 5: Create View for Email and Phone of Departments Located in Pune
+CREATE VIEW Pune_Department_Info AS
+SELECT s.email, s.phone, d.loc
+FROM Student s
+JOIN Department d
+ON s.dept_id = d.dept_id
+WHERE d.loc = 'Pune';
+Display View
+SELECT * FROM Pune_Department_Info;
+
+Query 6: Increase Salary of IT Department Instructors by 20%
+UPDATE Instructor
+SET salary = salary + (salary * 0.20)
+WHERE dept_id = (
+    SELECT dept_id
+    FROM Department
+    WHERE dept_name = 'IT'
+);

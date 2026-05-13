@@ -1,0 +1,109 @@
+p8
+
+CREATE TABLE Customer (
+    cust_id INT PRIMARY KEY,
+    cust_created_date DATE,
+    cust_name VARCHAR(50),
+    cust_phoneNo VARCHAR(15),
+    cust_emailID VARCHAR(100),
+    cust_city VARCHAR(50)
+);
+
+CREATE TABLE Product (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(50),
+    product_category VARCHAR(50),
+    product_price DECIMAL(10,2)
+);
+
+CREATE TABLE Orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    product_id INT,
+    order_date DATE,
+    quantity INT,
+    amount DECIMAL(10,2),
+
+    FOREIGN KEY (customer_id)
+    REFERENCES Customer(cust_id),
+
+    FOREIGN KEY (product_id)
+    REFERENCES Product(product_id)
+);
+
+INSERT INTO Customer VALUES
+(1,'2021-01-10','Rahul','9876543210','rahul@gmail.com','Pune'),
+(2,'2022-03-12','Priya','9876543211','priya@gmail.com','Mumbai'),
+(3,'2020-07-15','Amit','9876543212','amit@gmail.com','Delhi'),
+(4,'2023-05-20','Sneha','9876543213','sneha@gmail.com','Nashik');
+
+INSERT INTO Product VALUES
+(101,'Laptop','Electronics',70000),
+(102,'Mobile','Electronics',30000),
+(103,'Notebook','Stationary',100),
+(104,'Shirt','Cloth',1500),
+(105,'Printer','Electronics',12000),
+(106,'Pen','Stationary',50);
+
+INSERT INTO Orders VALUES
+(1001,1,101,'2019-02-10',1,70000),
+(1002,2,104,'2021-05-11',2,3000),
+(1003,1,105,'2022-07-15',1,12000),
+(1004,3,102,'2023-01-12',1,30000);
+
+
+Query 1: Find Products with Electronics, Stationary or Cloth Category
+SELECT *
+FROM Product
+WHERE product_category IN ('Electronics','Stationary','Cloth');
+
+Query 2: Find Customer Details Who Have Never Placed an Order
+SELECT c.*
+FROM Customer c
+LEFT JOIN Orders o
+ON c.cust_id = o.customer_id
+WHERE o.order_id IS NULL;
+
+Query 3: Find Names of 5 Most Expensive Products
+SELECT product_name, product_price
+FROM Product
+ORDER BY product_price DESC
+LIMIT 5;
+
+Query 4: Create View to Display Customers Who Placed Orders Worth More Than 10000
+CREATE VIEW High_Value_Customers AS
+SELECT DISTINCT c.cust_name,
+       o.amount
+FROM Customer c
+JOIN Orders o
+ON c.cust_id = o.customer_id
+WHERE o.amount > 10000;
+Display View
+SELECT * FROM High_Value_Customers;
+
+Query 5: Display Products with Price Category
+SELECT product_name,
+       product_price,
+
+       CASE
+           WHEN product_price < 200
+               THEN 'Cheap'
+
+           WHEN product_price BETWEEN 200 AND 1000
+               THEN 'Moderate'
+
+           ELSE 'Expensive'
+       END AS price_category
+
+FROM Product;
+
+Query 6: Increase Product Price of Electronics Category by 10%
+UPDATE Product
+SET product_price = product_price + (product_price * 0.10)
+WHERE product_category = 'Electronics';
+Verify Updated Prices
+SELECT * FROM Product;
+
+Query 7: Delete All Orders Placed After '2020-01-01'
+DELETE FROM Orders
+WHERE order_date > '2020-01-01';

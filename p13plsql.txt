@@ -1,0 +1,110 @@
+p13
+
+CREATE TABLE EMPLOYEE (
+
+    Emp_Id NUMBER PRIMARY KEY,
+    First_Name VARCHAR2(30),
+    Last_Name VARCHAR2(30),
+    Email VARCHAR2(50),
+    Phone_No VARCHAR2(15),
+    Hire_Date DATE,
+    Job_Profile VARCHAR2(30),
+    Salary NUMBER,
+    HRA NUMBER
+
+);
+
+CREATE TABLE COMPANY_INFO (
+
+    Emp_Count NUMBER,
+    Total_Salary_Expenses NUMBER
+
+);
+
+
+INSERT INTO COMPANY_INFO
+VALUES(0,0);
+
+COMMIT;
+
+Step 4: Create BEFORE INSERT Trigger
+
+CREATE OR REPLACE TRIGGER trg_before_insert
+BEFORE INSERT
+ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+    :NEW.HRA := :NEW.Salary * 0.10;
+END;
+/
+
+Step 5: Create AFTER INSERT Trigger
+CREATE OR REPLACE TRIGGER trg_after_insert
+AFTER INSERT
+ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+    UPDATE COMPANY_INFO
+    SET Emp_Count = Emp_Count + 1,
+        Total_Salary_Expenses =
+        Total_Salary_Expenses + :NEW.Salary;
+END;
+/
+
+Step 6: Create AFTER DELETE Trigger
+CREATE OR REPLACE TRIGGER trg_after_delete
+AFTER DELETE
+ON EMPLOYEE
+FOR EACH ROW
+BEGIN
+    UPDATE COMPANY_INFO
+    SET Emp_Count = Emp_Count - 1,
+        Total_Salary_Expenses =
+        Total_Salary_Expenses - :OLD.Salary;
+END;
+/
+
+Step 7: Insert Employee Records
+INSERT INTO EMPLOYEE
+VALUES(
+101,
+'Amit',
+'Sharma',
+'amit@gmail.com',
+'9876543210',
+TO_DATE('01-01-2020','DD-MM-YYYY'),
+'Manager',
+50000,
+NULL
+);
+
+INSERT INTO EMPLOYEE
+VALUES(
+102,
+'Neha',
+'Patil',
+'neha@gmail.com',
+'9876543211',
+TO_DATE('15-03-2021','DD-MM-YYYY'),
+'Developer',
+40000,
+NULL
+);
+
+INSERT INTO EMPLOYEE
+VALUES(
+103,
+'Rahul',
+'Kale',
+'rahul@gmail.com',
+'9876543212',
+TO_DATE('10-05-2022','DD-MM-YYYY'),
+'Tester',
+30000,
+NULL
+);
+
+COMMIT;
+
+Step 8: Display EMPLOYEE Table
+SELECT * FROM EMPLOYEE;

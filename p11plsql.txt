@@ -1,0 +1,120 @@
+p11
+
+CREATE TABLE Customer (
+    Cust_name VARCHAR2(50),
+    AccNo NUMBER PRIMARY KEY,
+    Balance NUMBER,
+    City VARCHAR2(30)
+);
+
+CREATE TABLE Loan (
+    Loan_no NUMBER PRIMARY KEY,
+    Branch_name VARCHAR2(50),
+    Amount NUMBER
+);
+
+CREATE TABLE Borrower (
+    Cust_name VARCHAR2(50),
+    Loan_no NUMBER,
+    CreditScore NUMBER
+);
+
+INSERT INTO Customer VALUES('Amit',101,100000,'Pune');
+INSERT INTO Customer VALUES('Neha',102,80000,'Mumbai');
+INSERT INTO Customer VALUES('Rahul',103,50000,'Nashik');
+INSERT INTO Customer VALUES('Priya',104,120000,'Pune');
+INSERT INTO Customer VALUES('Karan',105,60000,'Nagpur');
+
+COMMIT;
+
+INSERT INTO Loan VALUES(201,'Pune Branch',20000);
+INSERT INTO Loan VALUES(202,'Mumbai Branch',30000);
+INSERT INTO Loan VALUES(203,'Nashik Branch',25000);
+INSERT INTO Loan VALUES(204,'Pune Branch',60000);
+INSERT INTO Loan VALUES(205,'Nagpur Branch',55000);
+
+COMMIT;
+
+Step 6: Create PL/SQL Function
+CREATE OR REPLACE FUNCTION fn_creditscore(
+    p_balance NUMBER,
+    p_loan NUMBER
+)
+RETURN NUMBER
+IS
+    v_ratio NUMBER;
+    v_score NUMBER;
+BEGIN
+    v_ratio := (p_loan / p_balance) * 100;
+
+    IF v_ratio <= 20 THEN
+
+        v_score := 5;
+
+    ELSIF v_ratio <= 40 THEN
+
+        v_score := 4;
+
+    ELSIF v_ratio <= 50 THEN
+
+        v_score := 3;
+
+    ELSIF v_ratio <= 70 THEN
+
+        v_score := 2;
+
+    ELSIF v_ratio <= 90 THEN
+
+        v_score := 1;
+
+    ELSE
+
+        v_score := 0;
+
+    END IF;
+
+    RETURN v_score;
+
+END;
+/
+
+Step 7: Insert Credit Scores into Borrower Table
+INSERT INTO Borrower
+VALUES(
+    'Amit',
+    201,
+    fn_creditscore(100000,20000)
+);
+
+INSERT INTO Borrower
+VALUES(
+    'Neha',
+    202,
+    fn_creditscore(80000,30000)
+);
+
+INSERT INTO Borrower
+VALUES(
+    'Rahul',
+    203,
+    fn_creditscore(50000,25000)
+);
+
+INSERT INTO Borrower
+VALUES(
+    'Priya',
+    204,
+    fn_creditscore(120000,60000)
+);
+
+INSERT INTO Borrower
+VALUES(
+    'Karan',
+    205,
+    fn_creditscore(60000,55000)
+);
+
+COMMIT;
+
+Step 8: Display Output
+SELECT * FROM Borrower;

@@ -1,0 +1,114 @@
+p2
+
+CREATE TABLE Student (
+    stud_id INT PRIMARY KEY,
+    stud_name VARCHAR(50),
+    email VARCHAR(100),
+    phone VARCHAR(15),
+    dob DATE
+);
+
+CREATE TABLE Instructor (
+    instructor_id INT PRIMARY KEY,
+    instructor_name VARCHAR(50),
+    salary DECIMAL(10,2)
+);
+
+CREATE TABLE Course (
+    course_id INT PRIMARY KEY,
+    course_name VARCHAR(50),
+    credits INT,
+    instructor_id INT,
+
+    FOREIGN KEY (instructor_id)
+    REFERENCES Instructor(instructor_id)
+);
+
+CREATE TABLE Enrollment (
+    enrollment_id INT PRIMARY KEY,
+    student_id INT,
+    course_id INT,
+    date_of_enrollment DATE,
+
+    FOREIGN KEY (student_id)
+    REFERENCES Student(stud_id),
+
+    FOREIGN KEY (course_id)
+    REFERENCES Course(course_id)
+);
+
+INSERT INTO Student VALUES
+(1,'John','john@gmail.com','9876543210','2003-05-10'),
+(2,'Rahul','rahul@gmail.com','9876543211','2002-07-12'),
+(3,'Priya','priya@gmail.com','9876543212','2003-08-15'),
+(4,'Sneha','sneha@gmail.com','9876543213','2002-11-20');
+
+INSERT INTO Instructor VALUES
+(101,'Dr. Sharma',80000),
+(102,'Dr. Patil',65000),
+(103,'Dr. Mehta',65000);
+
+INSERT INTO Course VALUES
+(201,'DBMS',4,101),
+(202,'OS',3,102),
+(203,'CN',4,103);
+
+INSERT INTO Enrollment VALUES
+(1,1,201,'2025-01-10'),
+(2,2,201,'2025-01-11'),
+(3,2,202,'2025-01-12'),
+(4,3,203,'2025-01-13'),
+(5,4,201,'2025-01-14');
+
+Query 1: List All Students Who Have Enrolled for Any Course
+SELECT DISTINCT s.stud_name
+FROM Student s
+JOIN Enrollment e
+ON s.stud_id = e.student_id;
+
+Query 2: Find Students Enrolled in the Course "DBMS"
+SELECT s.stud_name
+FROM Student s
+JOIN Enrollment e
+ON s.stud_id = e.student_id
+JOIN Course c
+ON e.course_id = c.course_id
+WHERE c.course_name = 'DBMS';
+
+Query 3: Find Students Enrolled in More Than One Course
+SELECT s.stud_name, COUNT(e.course_id) AS total_courses
+FROM Student s
+JOIN Enrollment e
+ON s.stud_id = e.student_id
+GROUP BY s.stud_name
+HAVING COUNT(e.course_id) > 1;
+
+Query 4: Find Students Enrolled in the Same Course as "John"
+SELECT DISTINCT s2.stud_name
+FROM Student s1
+JOIN Enrollment e1
+ON s1.stud_id = e1.student_id
+
+JOIN Enrollment e2
+ON e1.course_id = e2.course_id
+
+JOIN Student s2
+ON e2.student_id = s2.stud_id
+
+WHERE s1.stud_name = 'John'
+AND s2.stud_name <> 'John';
+
+Query 5: Find Instructor(s) with Lowest Salary
+SELECT instructor_name, salary
+FROM Instructor
+WHERE salary = (
+    SELECT MIN(salary)
+    FROM Instructor
+);
+
+Query 6: Create View of Instructors and Their Courses
+CREATE VIEW Instructor_Course_View AS
+SELECT i.instructor_name, c.course_name
+FROM Instructor i
+JOIN Course c
+ON i.instructor_id = c.instructor_id;

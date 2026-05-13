@@ -1,0 +1,73 @@
+p10
+
+
+CREATE TABLE Customer (
+    Cust_name VARCHAR2(50),
+    AccNo NUMBER PRIMARY KEY,
+    Balance NUMBER,
+    City VARCHAR2(30)
+);
+
+CREATE TABLE Loan (
+    Loan_no NUMBER PRIMARY KEY,
+    Branch_name VARCHAR2(50),
+    Amount NUMBER
+);
+
+CREATE TABLE Borrower (
+    Cust_name VARCHAR2(50),
+    Loan_no NUMBER
+);
+
+INSERT INTO Customer VALUES('Amit',101,100000,'Pune');
+INSERT INTO Customer VALUES('Neha',102,80000,'Mumbai');
+INSERT INTO Customer VALUES('Rahul',103,50000,'Nashik');
+INSERT INTO Customer VALUES('Priya',104,120000,'Pune');
+INSERT INTO Customer VALUES('Karan',105,60000,'Nagpur');
+
+COMMIT;
+
+INSERT INTO Loan VALUES(201,'Pune Branch',20000);
+INSERT INTO Loan VALUES(202,'Mumbai Branch',30000);
+INSERT INTO Loan VALUES(203,'Nashik Branch',25000);
+INSERT INTO Loan VALUES(204,'Pune Branch',60000);
+INSERT INTO Loan VALUES(205,'Nagpur Branch',55000);
+
+COMMIT;
+
+INSERT INTO Borrower VALUES('Amit',201);
+INSERT INTO Borrower VALUES('Neha',202);
+INSERT INTO Borrower VALUES('Rahul',203);
+INSERT INTO Borrower VALUES('Priya',204);
+INSERT INTO Borrower VALUES('Karan',205);
+
+COMMIT;
+
+Step 7: Create Stored Procedure with Cursor
+CREATE OR REPLACE PROCEDURE proc_customer_loan
+AS
+    CURSOR c1 IS
+        SELECT c.Cust_name,
+               c.Balance,
+               l.Amount
+        FROM Customer c
+        JOIN Borrower b
+        ON c.Cust_name = b.Cust_name
+        JOIN Loan l
+        ON b.Loan_no = l.Loan_no;
+BEGIN
+    FOR rec IN c1 LOOP
+        DBMS_OUTPUT.PUT_LINE(
+            'Customer Name : ' || rec.Cust_name
+            || ' | Balance : ' || rec.Balance
+            || ' | Loan Amount : ' || rec.Amount
+        );
+    END LOOP;
+END;
+/
+
+Step 9: Execute Procedure
+BEGIN
+    proc_customer_loan;
+END;
+/
